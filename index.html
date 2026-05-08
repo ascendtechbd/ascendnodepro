@@ -34,9 +34,11 @@ body {
   color: var(--text);
   min-height: 100vh;
   padding: 15px 12px 30px 12px;
+  display: flex;
+  justify-content: center;
 }
 
-.container { width: 100%; max-width: 450px; margin: 0 auto; }
+.container { width: 100%; max-width: 450px; }
 
 .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; margin-bottom: 10px; }
 .header-title { font-size: 22px; font-weight: 800; letter-spacing: -1px; color: #fff; }
@@ -87,7 +89,7 @@ input[type="time"] { background: rgba(255,255,255,0.08); border: 1px solid var(-
 
 <div class="container">
   <div class="header">
-    <div class="header-title" id="dev-label">ASCEND NODE</div>
+    <div class="header-title" id="dev-label">NODE PRO</div>
     <div class="status" id="status-text">OFFLINE</div>
   </div>
 
@@ -148,14 +150,14 @@ input[type="time"] { background: rgba(255,255,255,0.08); border: 1px solid var(-
 </div>
 
 <script>
-  // --- DYNAMIC ID LOGIC ---
+  // --- HIDDEN ID LOGIC ---
   const urlParams = new URLSearchParams(window.location.search);
-  const deviceID = urlParams.get('id') || "AT-TEMP-000"; 
-  document.getElementById('dev-label').innerText = deviceID;
+  const deviceID = urlParams.get('id') || "HIDDEN-ID"; // ব্যাকগ্রাউন্ডে আইডি কাজ করবে 
+  document.getElementById('dev-label').innerText = "NODE PRO"; // স্ক্রিনে আইডি লুকিয়ে রাখা হলো
 
   const broker = "wss://broker.hivemq.com:8884/mqtt";
   const client = mqtt.connect(broker);
-  let counts = { 1: 0, 2: 0 };
+  let counts = { 1: 0, 2: 0 }; [cite: 29]
 
   client.on('connect', () => {
     const st = document.getElementById('status-text');
@@ -163,27 +165,27 @@ input[type="time"] { background: rgba(255,255,255,0.08); border: 1px solid var(-
     st.style.color = "#30D158";
     st.style.background = "rgba(48, 209, 88, 0.15)";
     client.subscribe(`ascend/${deviceID}/stat/#`);
-  });
+  }); [cite: 29]
 
   client.on('offline', () => {
     const st = document.getElementById('status-text');
     st.innerText = "OFFLINE";
     st.style.color = "#FF453A";
     st.style.background = "rgba(255, 69, 58, 0.15)";
-  });
+  }); [cite: 30]
 
   client.on('message', (topic, message) => {
     const msg = message.toString();
     if (topic.endsWith("light")) document.getElementById('sw1').checked = (msg === "ON");
     if (topic.endsWith("fan"))   document.getElementById('sw2').checked = (msg === "ON");
-  });
+  }); [cite: 31]
 
   function manual(id) {
     const dev = (id === 1) ? "light" : "fan";
     const state = document.getElementById('sw' + id).checked ? "ON" : "OFF";
     client.publish(`ascend/${deviceID}/cmd/${dev}`, state);
     if(state === "OFF") cancelT(id);
-  }
+  } [cite: 32, 33]
 
   function setT(id, s) {
     counts[id] = s;
@@ -193,9 +195,9 @@ input[type="time"] { background: rgba(255,255,255,0.08); border: 1px solid var(-
     client.publish(`ascend/${deviceID}/cmd/${dev}`, "ON");
     let p = {}; p[key] = Math.floor(s / 60);
     client.publish(`ascend/${deviceID}/cmd/settings`, JSON.stringify(p));
-  }
+  } [cite: 34, 35, 36]
 
-  function cancelT(id) { counts[id] = 0; document.getElementById('c' + id).innerText = ""; }
+  function cancelT(id) { counts[id] = 0; document.getElementById('c' + id).innerText = ""; } [cite: 37]
 
   function saveSettings() {
     const config = {
@@ -207,13 +209,13 @@ input[type="time"] { background: rgba(255,255,255,0.08); border: 1px solid var(-
     };
     client.publish(`ascend/${deviceID}/cmd/settings`, JSON.stringify(config));
     alert("Settings Synced!");
-  }
+  } [cite: 38, 39]
 
   function update() {
     const d = new Date();
     document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
     document.getElementById('date').innerText = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-  }
+  } [cite: 40]
 
   function tick() {
     for (let i in counts) {
@@ -224,7 +226,7 @@ input[type="time"] { background: rgba(255,255,255,0.08); border: 1px solid var(-
         if(counts[i] === 0) { document.getElementById('sw' + i).checked = false; document.getElementById('c' + i).innerText = ""; }
       }
     }
-  }
+  } [cite: 41, 42, 43]
 
   setInterval(update, 1000);
   setInterval(tick, 1000);
