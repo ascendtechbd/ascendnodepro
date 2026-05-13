@@ -1,133 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Ascend Node Pro Final</title>
-<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-:root { --bg: #000; --bg-card: rgba(255,255,255,0.05); --accent: #0A84FF; --success: #30D158; --warn: #FF9F0A; --danger: #FF453A; --border: rgba(255,255,255,0.1); --text: #fff; --text-dim: rgba(255,255,255,0.5); }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg); color: var(--text); padding: 15px; background-image: radial-gradient(at 0% 0%, rgba(10,132,255,0.1) 0px, transparent 50%); }
-.container { width: 100%; max-width: 450px; margin: 0 auto; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.status { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
-.glass-card { background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 12px; }
-.time-main { font-size: 50px; font-weight: 200; text-align: center; }
-.section-title { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin: 20px 0 10px 5px; }
-.dev-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.switch { position: relative; width: 46px; height: 26px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); transition: .3s; border-radius: 30px; }
-.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50%; }
-input:checked + .slider { background: var(--success); }
-input:checked + .slider:before { transform: translateX(20px); }
-.btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.btn-t { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 12px; font-size: 10px; font-weight: 600; cursor: pointer; }
-.btn-cancel { color: var(--danger); border-color: rgba(255,69,58,0.2); }
-input[type="time"] { background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 10px; width: 100%; margin-top: 5px; outline: none; }
-.primary-btn { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 18px; color: #fff; font-weight: 700; margin-top: 15px; cursor: pointer; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Node Pro v6.5 Global</title>
+    
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+      import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA4PHqC-Ih4F4tpupQytorLUrS6768w5aE",
+        databaseURL: "https://nodepro-c097e-default-rtdb.asia-southeast1.firebasedatabase.app/"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      // কমান্ড পাঠানোর ফাংশন
+      window.updateDevice = (path, val) => {
+        set(ref(db, path), val);
+      };
+
+      // ফায়ারবেস থেকে সব ডাটা রিয়েল-টাইমে পড়া
+      onValue(ref(db, "/"), (snap) => {
+        const data = snap.val();
+        if(!data) return;
+
+        // সুইচ আপডেট
+        document.getElementById('sw1').checked = data.L1;
+        document.getElementById('sw2').checked = data.L2;
+        
+        // অটোমেশন ও অ্যালার্ম স্টেট আপডেট
+        document.getElementById('alarm_time').value = data.alarmTime || "06:30";
+        document.getElementById('l1_on').value = data.l1On || "00:00";
+        document.getElementById('l1_off').value = data.l1Off || "00:00";
+        
+        // কানেকশন স্ট্যাটাস
+        document.getElementById('conStatus').innerText = "● GLOBAL ONLINE";
+        document.getElementById('conStatus').style.color = "#30D158";
+      });
+
+      // ঘড়ি আপডেট (ডিভাইস টাইম এর বদলে ব্রাউজার টাইম দিয়ে সিমুলেট করা হচ্ছে)
+      setInterval(() => {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+      }, 1000);
+    </script>
+
+    <style>
+        :root { --bg: #000000; --card: rgba(255,255,255,0.06); --accent: #0A84FF; --success: #30D158; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 450px; margin: auto; }
+        
+        .header { margin-bottom: 25px; }
+        #clock { font-size: 48px; font-weight: 200; letter-spacing: -2px; margin: 10px 0; }
+        #conStatus { font-size: 12px; font-weight: 700; color: #ff3b30; }
+
+        .glass-card {
+            background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .row { display: flex; justify-content: space-between; align-items: center; }
+        h3 { margin: 0; font-size: 17px; font-weight: 600; }
+        
+        /* Inputs & Switches */
+        input[type="time"] { 
+            background: rgba(255,255,255,0.1); border: none; color: white; 
+            padding: 8px; border-radius: 10px; font-family: inherit;
+        }
+        .switch { position: relative; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background: var(--success); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .automation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .auto-item { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 15px; font-size: 12px; }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="header"><h3>NODE PRO</h3><div class="status" id="status-text">CONNECTING...</div></div>
-  <div class="glass-card"><div class="time-main" id="clock">00:00:00</div><div id="date" style="text-align:center;font-size:13px;color:var(--text-dim)">Loading...</div></div>
-  
-  <div class="section-title">Controls</div>
-  <div class="glass-card">
-    <div class="dev-header"><div><h4>Light</h4><div id="c1" style="font-size:10px;color:var(--warn)"></div></div><label class="switch"><input type="checkbox" id="sw1" onchange="manual(1)"><span class="slider"></span></label></div>
-    <div class="btn-group"><button class="btn-t" onclick="setT(1,300)">5M</button><button class="btn-t" onclick="setT(1,1800)">30M</button><button class="btn-t" onclick="setT(1,3600)">1H</button><button class="btn-t btn-cancel" onclick="cancelT(1)">OFF</button></div>
-  </div>
+    <div class="container">
+        <div class="header">
+            <div id="conStatus">● SYNCING...</div>
+            <div id="clock">00:00:00</div>
+            <p style="opacity: 0.5; font-size: 14px;">Ascend Node Pro v6.5 Global</p>
+        </div>
 
-  <div class="glass-card">
-    <div class="dev-header"><div><h4>Fan</h4><div id="c2" style="font-size:10px;color:var(--warn)"></div></div><label class="switch"><input type="checkbox" id="sw2" onchange="manual(2)"><span class="slider"></span></label></div>
-    <div class="btn-group"><button class="btn-t" onclick="setT(2,300)">5M</button><button class="btn-t" onclick="setT(2,1800)">30M</button><button class="btn-t" onclick="setT(2,3600)">1H</button><button class="btn-t btn-cancel" onclick="cancelT(2)">OFF</button></div>
-  </div>
+        <div class="glass-card">
+            <div class="row">
+                <h3>Light (Load 1)</h3>
+                <label class="switch">
+                    <input type="checkbox" id="sw1" onchange="updateDevice('L1_CMD', this.checked ? 1 : 0)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
 
-  <div class="section-title">Settings</div>
-  <div class="glass-card">
-    <div style="margin-bottom:15px"><span>Alarm</span><input type="time" id="alarmTime"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px">
-      <div><span>Light On</span><input type="time" id="lOn"></div><div><span>Light Off</span><input type="time" id="lOff"></div>
+        <div class="glass-card">
+            <div class="row">
+                <h3>Fan (Load 2)</h3>
+                <label class="switch">
+                    <input type="checkbox" id="sw2" onchange="updateDevice('L2_CMD', this.checked ? 1 : 0)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="row">
+                <h3>Smart Alarm</h3>
+                <input type="time" id="alarm_time" onchange="updateDevice('alarmTime', this.value)">
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Load 1 Automation</h3>
+            <div class="automation-grid">
+                <div class="auto-item">
+                    <span>ON Time:</span><br>
+                    <input type="time" id="l1_on" onchange="updateDevice('l1On', this.value)" style="width: 100%; margin-top: 5px;">
+                </div>
+                <div class="auto-item">
+                    <span>OFF Time:</span><br>
+                    <input type="time" id="l1_off" onchange="updateDevice('l1Off', this.value)" style="width: 100%; margin-top: 5px;">
+                </div>
+            </div>
+        </div>
+
+        <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2);">
+            DESIGNED BY ASCEND TECH BD
+        </p>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div><span>Fan On</span><input type="time" id="fOn"></div><div><span>Fan Off</span><input type="time" id="fOff"></div>
-    </div>
-    <button class="primary-btn" onclick="saveSettings()">Save Settings</button>
-  </div>
-</div>
-
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const deviceID = urlParams.get('id') || "ANP08052601";
-  const client = mqtt.connect("wss://ascend-node-pro.cloud.shiftr.io", { username: 'ascend-node-pro', password: '79tyZzK4Gfk3F9Cw', clientId: 'web_'+Math.random().toString(16).substr(2,8) });
-  let counts = { 1: 0, 2: 0 };
-
-  client.on('connect', () => { client.subscribe(`ascend/${deviceID}/status`); client.subscribe(`ascend/${deviceID}/stat/#`); });
-  
-  client.on('message', (topic, msg) => {
-    const m = msg.toString();
-    if (topic.endsWith("status")) updateStatus(m);
-    if (topic.endsWith("light")) document.getElementById('sw1').checked = (m === "ON");
-    if (topic.endsWith("fan")) document.getElementById('sw2').checked = (m === "ON");
-    if (topic.endsWith("settings")) {
-      const j = JSON.parse(m);
-      if(j.alarm) document.getElementById('alarmTime').value = j.alarm;
-      if(j.lOn) document.getElementById('lOn').value = j.lOn;
-      if(j.lOff) document.getElementById('lOff').value = j.lOff;
-      if(j.fOn) document.getElementById('fOn').value = j.fOn;
-      if(j.fOff) document.getElementById('fOff').value = j.fOff;
-    }
-  });
-
-  function updateStatus(s) {
-    const el = document.getElementById('status-text');
-    el.innerText = s === "online" ? "ONLINE" : "OFFLINE";
-    el.style.color = s === "online" ? "#30D158" : "#FF453A";
-    el.style.background = s === "online" ? "rgba(48,209,88,0.1)" : "rgba(255,69,58,0.1)";
-  }
-
-  function manual(id) { 
-    const dev = id === 1 ? "light" : "fan"; 
-    const state = document.getElementById('sw'+id).checked ? "ON" : "OFF";
-    client.publish(`ascend/${deviceID}/cmd/${dev}`, state); 
-    if(state === "OFF") cancelT(id);
-  }
-
-  function setT(id, s) {
-    counts[id] = s;
-    document.getElementById('sw'+id).checked = true; // সুইচ ভিজ্যুয়ালি অন করা
-    const key = id === 1 ? "lTimer" : "fTimer";
-    let p = {}; p[key] = Math.floor(s/60);
-    client.publish(`ascend/${deviceID}/cmd/settings`, JSON.stringify(p));
-  }
-
-  function cancelT(id) {
-    counts[id] = 0; document.getElementById('c'+id).innerText = "";
-    const key = id === 1 ? "lTimer" : "fTimer";
-    let p = {}; p[key] = 0;
-    client.publish(`ascend/${deviceID}/cmd/settings`, JSON.stringify(p));
-  }
-
-  function saveSettings() {
-    const config = { alarm: document.getElementById('alarmTime').value, lOn: document.getElementById('lOn').value, lOff: document.getElementById('lOff').value, fOn: document.getElementById('fOn').value, fOff: document.getElementById('fOff').value };
-    client.publish(`ascend/${deviceID}/cmd/settings`, JSON.stringify(config));
-    alert("Settings Sent!");
-  }
-
-  setInterval(() => {
-    const d = new Date(); document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
-    document.getElementById('date').innerText = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-    for (let i in counts) {
-      if (counts[i] > 0) {
-        counts[i]--; let m = Math.floor(counts[i]/60), s = counts[i]%60;
-        document.getElementById('c'+i).innerText = `Timer: ${m}m ${s}s`;
-        if(counts[i] === 0) { document.getElementById('sw'+i).checked = false; document.getElementById('c'+i).innerText = ""; }
-      }
-    }
-  }, 1000);
-</script>
 </body>
 </html>
